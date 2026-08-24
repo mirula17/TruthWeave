@@ -1,0 +1,14 @@
+{
+  "name": "truthweave-extension",
+  "version": "1.0.0",
+  "description": "TruthWeave Chrome Extension for claim verification",
+  "main": "dist/background.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.263",
+    "typescript": "^5.3.3"
+  }
+}

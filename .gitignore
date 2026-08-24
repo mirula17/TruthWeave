@@ -1,0 +1,59 @@
+# ==============================
+# TruthWeave Git Ignore
+# ==============================
+
+# Environment / Secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# FastAPI
+*.log
+
+# Node
+node_modules/
+dist/
+build/
+.npm/
+*.tsbuildinfo
+
+# Vite
+.vite/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
+# Credentials / certificates
+*.pem
+*.key
+*.crt
+
+# Generated files
+coverage/

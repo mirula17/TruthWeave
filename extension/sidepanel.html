@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TruthWeave Verification Center</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      background-color: #0f172a;
+      color: #f1f5f9;
+      font-size: 14px;
+    }
+    h1 {
+      font-size: 18px;
+      margin-top: 0;
+      color: #38bdf8;
+    }
+    .card {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+      backdrop-filter: blur(10px);
+    }
+    .btn {
+      background: #0284c7;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      width: 100%;
+    }
+    .btn:hover {
+      background: #0369a1;
+    }
+    .status {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+  <h1>TruthWeave Panel</h1>
+  <div class="card" id="auth-status-card">
+    <p>Checking authentication status...</p>
+  </div>
+  <div class="card" id="verification-card" style="display: none;">
+    <h3>Active Claim</h3>
+    <p id="claim-text" class="status">No text selected for verification yet. Right-click text on a web page and select "Verify with TruthWeave".</p>
+    <button class="btn" id="verify-btn" style="margin-top: 8px;">Run AI Verification</button>
+  </div>
+  <div class="card" id="results-card" style="display: none;">
+    <h3>Verification Report</h3>
+    <div id="results-content"></div>
+  </div>
+  <script src="dist/sidepanel.js" type="module"></script>
+</body>
+</html>
