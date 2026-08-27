@@ -29,7 +29,7 @@ interface MobileNavProps {
 }
 
 export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose, isAdmin = false }) => {
-  const { user, role, logout, quickLoginAs } = useAuth();
+  const { user, role, logout } = useAuth();
   const navigate = useNavigate();
 
   if (!isOpen) return null;
@@ -136,25 +136,25 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose, isAdmin =
           )}
         </div>
 
-        {/* Quick Role switch */}
-        <div className="py-2">
-          <button
-            onClick={() => {
-              const nextRole = role === 'ADMIN' ? 'USER' : 'ADMIN';
-              quickLoginAs(nextRole);
-              onClose();
-              if (nextRole === 'ADMIN') navigate('/admin');
-              else navigate('/dashboard');
-            }}
-            className="flex w-full items-center justify-between rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-2 text-xs text-slate-300"
-          >
-            <span className="flex items-center gap-1.5">
-              <ArrowRightLeft size={13} className="text-indigo-400" />
-              <span>Switch Role:</span>
-            </span>
-            <RoleBadge role={role || 'USER'} />
-          </button>
-        </div>
+        {/* Admin Console Switcher */}
+        {role === 'ADMIN' && (
+          <div className="py-2">
+            <button
+              onClick={() => {
+                onClose();
+                if (isAdmin) navigate('/dashboard');
+                else navigate('/admin');
+              }}
+              className="flex w-full items-center justify-between rounded-lg border border-indigo-500/30 bg-indigo-950/40 px-3 py-2 text-xs text-indigo-300"
+            >
+              <span className="flex items-center gap-1.5">
+                <ArrowRightLeft size={13} className="text-indigo-400" />
+                <span>{isAdmin ? 'User View' : 'Admin Console'}</span>
+              </span>
+              <RoleBadge role="ADMIN" />
+            </button>
+          </div>
+        )}
 
         {/* User Card & Logout */}
         <div className="border-t border-slate-800 pt-3">

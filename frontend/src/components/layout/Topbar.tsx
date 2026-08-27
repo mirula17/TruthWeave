@@ -21,7 +21,7 @@ interface TopbarProps {
 }
 
 export const Topbar: React.FC<TopbarProps> = ({ onMenuClick, isAdmin = false }) => {
-  const { user, role, logout, quickLoginAs } = useAuth();
+  const { user, role, logout } = useAuth();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
@@ -58,34 +58,33 @@ export const Topbar: React.FC<TopbarProps> = ({ onMenuClick, isAdmin = false }) 
         </form>
       </div>
 
-      {/* Right: Actions, Notifications, Profile */}
+      {/* Right Controls */}
       <div className="flex items-center gap-2 sm:gap-3">
-        {/* Quick Verify Button (User View only) */}
         {!isAdmin && (
           <button
             onClick={() => navigate('/verify')}
-            className="hidden sm:inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-lg shadow-sky-500/20 hover:from-sky-400 hover:to-indigo-500 transition-all active:scale-[0.98]"
+            className="hidden sm:inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-lg shadow-sky-500/20 hover:opacity-90 transition-all"
           >
             <Sparkles size={14} />
             <span>New Verification</span>
           </button>
         )}
 
-        {/* Quick Role Switcher Button */}
-        <button
-          onClick={() => {
-            const nextRole = role === 'ADMIN' ? 'USER' : 'ADMIN';
-            quickLoginAs(nextRole);
-            if (nextRole === 'ADMIN') navigate('/admin');
-            else navigate('/dashboard');
-          }}
-          className="hidden md:inline-flex items-center gap-1.5 rounded-xl border border-slate-800 bg-slate-900/60 px-2.5 py-1.5 text-xs text-slate-300 hover:border-slate-700 hover:text-white transition-all"
-          title="Toggle testing role between USER and ADMIN"
-        >
-          <ArrowRightLeft size={13} className="text-indigo-400" />
-          <span>Role:</span>
-          <RoleBadge role={role || 'USER'} size="sm" />
-        </button>
+        {/* Admin Navigation Button */}
+        {role === 'ADMIN' && (
+          <button
+            onClick={() => {
+              if (isAdmin) navigate('/dashboard');
+              else navigate('/admin');
+            }}
+            className="hidden md:inline-flex items-center gap-1.5 rounded-xl border border-indigo-500/30 bg-indigo-950/40 px-2.5 py-1.5 text-xs text-indigo-300 hover:bg-indigo-900/40 transition-all"
+            title={isAdmin ? "Switch to User Dashboard" : "Open Admin Console"}
+          >
+            <ArrowRightLeft size={13} className="text-indigo-400" />
+            <span>{isAdmin ? "User View" : "Admin Console"}</span>
+            <RoleBadge role="ADMIN" size="sm" />
+          </button>
+        )}
 
         {/* Notifications Dropdown */}
         <div className="relative">

@@ -2,3 +2,5 @@
 from app.db.session import Base # noqa
 from app.models.user import User # noqa
 from app.models.audit import AuditLog # noqa
+from app.models.verification import Verification # noqa
+from app.models.document import Document # noqa

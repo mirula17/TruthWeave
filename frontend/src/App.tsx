@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import { AdminRoute } from './routes/AdminRoute';
@@ -33,6 +34,7 @@ function App() {
   return (
     <Router>
       <AuthProvider>
+        <Toaster position="top-right" richColors />
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<LandingPage />} />

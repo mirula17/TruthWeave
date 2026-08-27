@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Sparkles,
@@ -17,23 +17,17 @@ export const VerifyPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const getTabFromPath = (): TabType => {
-    if (location.pathname.includes('/upload')) return 'upload';
-    if (location.pathname.includes('/url')) return 'url';
-    return 'claim';
-  };
+  const activeTab: TabType = location.pathname.includes('/upload')
+    ? 'upload'
+    : location.pathname.includes('/url')
+    ? 'url'
+    : 'claim';
 
-  const [activeTab, setActiveTab] = useState<TabType>(getTabFromPath());
   const [progressOpen, setProgressOpen] = useState(false);
-  const [pendingResultId, setPendingResultId] = useState('ver-8941');
+  const [pendingResultId, setPendingResultId] = useState('');
   const [claimPreviewText, setClaimPreviewText] = useState('');
 
-  useEffect(() => {
-    setActiveTab(getTabFromPath());
-  }, [location.pathname]);
-
   const handleTabChange = (tab: TabType) => {
-    setActiveTab(tab);
     if (tab === 'claim') navigate('/verify/claim');
     else if (tab === 'upload') navigate('/verify/upload');
     else if (tab === 'url') navigate('/verify/url');

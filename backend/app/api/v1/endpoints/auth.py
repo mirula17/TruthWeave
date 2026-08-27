@@ -1,6 +1,6 @@
 from datetime import timedelta
 from typing import Any
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
@@ -10,12 +10,19 @@ from app.api import deps
 from app.db.session import get_db
 from app.models.user import User
 from app.models.audit import AuditLog
+from app.models.verification import Verification
 from app.schemas.user import UserCreate, UserResponse
 from app.schemas.token import Token
 
 router = APIRouter()
 
-def log_audit_event(db: Session, user_id: Any, action: str, ip: str | None = None, details: str | None = None):
+def log_audit_event(
+    db: Session,
+    user_id: Any,
+    action: str,
+    ip: str | None = None,
+    details: str | None = None
+):
     audit_entry = AuditLog(
         user_id=user_id,
         action=action,
@@ -26,10 +33,12 @@ def log_audit_event(db: Session, user_id: Any, action: str, ip: str | None = Non
     db.commit()
 
 @router.post("/signup", response_model=UserResponse)
+@router.post("/register", response_model=UserResponse)
 def signup(
     *,
     db: Session = Depends(get_db),
-    user_in: UserCreate
+    user_in: UserCreate,
+    request: Request
 ) -> Any:
     # Check if user already exists
     user = db.query(User).filter(User.email == user_in.email).first()
@@ -46,6 +55,7 @@ def signup(
     hashed_password = security.get_password_hash(user_in.password)
     db_user = User(
         email=user_in.email,
+        name=user_in.name or user_in.email.split("@")[0],
         hashed_password=hashed_password,
         role=role,
         is_active=True
@@ -54,11 +64,16 @@ def signup(
     db.commit()
     db.refresh(db_user)
     
-    log_audit_event(db, db_user.id, "USER_SIGNUP", details=f"User signed up with role: {role}")
-    return db_user
+    client_ip = request.client.host if request.client else None
+    log_audit_event(db, db_user.id, "USER_SIGNUP", ip=client_ip, details=f"User signed up with role: {role}")
+    
+    res = UserResponse.model_validate(db_user)
+    res.verifications_count = 0
+    return res
 
 @router.post("/login", response_model=Token)
 def login(
+    request: Request,
     db: Session = Depends(get_db),
     form_data: OAuth2PasswordRequestForm = Depends()
 ) -> Any:
@@ -73,7 +88,8 @@ def login(
         user.id, expires_delta=access_token_expires
     )
     
-    log_audit_event(db, user.id, "USER_LOGIN")
+    client_ip = request.client.host if request.client else None
+    log_audit_event(db, user.id, "USER_LOGIN", ip=client_ip, details=f"User logged in from {client_ip}")
     return {
         "access_token": access_token,
         "token_type": "bearer",
@@ -81,6 +97,10 @@ def login(
 
 @router.get("/me", response_model=UserResponse)
 def read_user_me(
+    db: Session = Depends(get_db),
     current_user: User = Depends(deps.get_current_active_user)
 ) -> Any:
-    return current_user
+    count = db.query(Verification).filter(Verification.user_id == current_user.id).count()
+    res = UserResponse.model_validate(current_user)
+    res.verifications_count = count
+    return res

@@ -18,7 +18,7 @@ import { useAuth } from '../../context/AuthContext';
 import { RoleBadge } from '../common/Badge';
 
 export const Sidebar: React.FC = () => {
-  const { user, role, logout, quickLoginAs } = useAuth();
+  const { user, role, logout } = useAuth();
   const navigate = useNavigate();
 
   const navItems = [
@@ -142,25 +142,22 @@ export const Sidebar: React.FC = () => {
         </div>
       </div>
 
-      {/* Role Toggle Switcher (for immediate testing of both roles) */}
-      <div className="px-3 pb-2">
-        <button
-          onClick={() => {
-            const nextRole = role === 'ADMIN' ? 'USER' : 'ADMIN';
-            quickLoginAs(nextRole);
-            if (nextRole === 'ADMIN') navigate('/admin');
-            else navigate('/dashboard');
-          }}
-          className="flex w-full items-center justify-between rounded-lg border border-slate-800/80 bg-slate-900/40 px-2.5 py-1.5 text-xs text-slate-400 hover:border-slate-700 hover:text-slate-200 transition-colors"
-          title="Switch between USER and ADMIN modes for testing"
-        >
-          <span className="flex items-center gap-1.5">
-            <ArrowRightLeft size={13} className="text-indigo-400" />
-            <span>Test Role:</span>
-          </span>
-          <RoleBadge role={role || 'USER'} />
-        </button>
-      </div>
+      {/* Role Display / Switcher */}
+      {role === 'ADMIN' && (
+        <div className="px-3 pb-2">
+          <button
+            onClick={() => navigate('/admin')}
+            className="flex w-full items-center justify-between rounded-lg border border-indigo-500/30 bg-indigo-950/30 px-2.5 py-1.5 text-xs text-indigo-300 hover:bg-indigo-900/40 transition-colors"
+            title="Open Admin Console"
+          >
+            <span className="flex items-center gap-1.5">
+              <ArrowRightLeft size={13} className="text-indigo-400" />
+              <span>Admin Console</span>
+            </span>
+            <RoleBadge role="ADMIN" />
+          </button>
+        </div>
+      )}
 
       {/* User Footer Card */}
       <div className="border-t border-slate-800/80 p-3">

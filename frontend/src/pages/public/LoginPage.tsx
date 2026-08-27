@@ -7,7 +7,7 @@ import { useAuth } from '../../context/AuthContext';
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, quickLoginAs, loading } = useAuth();
+  const { login, loading } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -32,12 +32,13 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const handleDemoLogin = (role: 'USER' | 'ADMIN') => {
-    quickLoginAs(role);
+  const handleDemoFill = (role: 'USER' | 'ADMIN') => {
     if (role === 'ADMIN') {
-      navigate('/admin');
+      setEmail('mirula@gmail.com.com');
+      setPassword('admin123');
     } else {
-      navigate('/dashboard');
+      setEmail('mirulaarulmurugan@gmail.com');
+      setPassword('user123');
     }
   };
 
@@ -68,27 +69,27 @@ export const LoginPage: React.FC = () => {
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="rounded-3xl border border-slate-800/90 bg-slate-900/60 p-8 backdrop-blur-2xl shadow-2xl shadow-sky-500/5 space-y-6">
           
-          {/* 1-Click Demo Testing Box */}
+          {/* Quick Credential Fill Box */}
           <div className="rounded-2xl border border-indigo-500/30 bg-indigo-950/20 p-4 text-xs">
             <div className="flex items-center gap-1.5 font-bold text-indigo-300 mb-2">
               <Sparkles size={14} className="text-indigo-400" />
-              <span>Instant Demo Accounts (1-Click Login):</span>
+              <span>Fill Test Account Credentials:</span>
             </div>
             <div className="grid grid-cols-2 gap-2.5">
               <button
                 type="button"
-                onClick={() => handleDemoLogin('USER')}
+                onClick={() => handleDemoFill('USER')}
                 className="flex items-center justify-center gap-1.5 rounded-xl border border-sky-500/30 bg-sky-500/10 py-2 px-3 text-xs font-semibold text-sky-300 hover:bg-sky-500/20 transition-all"
               >
-                <span>Normal USER</span>
+                <span>Fill USER</span>
               </button>
               <button
                 type="button"
-                onClick={() => handleDemoLogin('ADMIN')}
+                onClick={() => handleDemoFill('ADMIN')}
                 className="flex items-center justify-center gap-1.5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 py-2 px-3 text-xs font-semibold text-indigo-300 hover:bg-indigo-500/20 transition-all"
               >
                 <Shield size={12} />
-                <span>ADMIN Role</span>
+                <span>Fill ADMIN</span>
               </button>
             </div>
           </div>

@@ -17,7 +17,7 @@ import { useAuth } from '../../context/AuthContext';
 import { RoleBadge } from '../common/Badge';
 
 export const AdminSidebar: React.FC = () => {
-  const { user, role, logout, quickLoginAs } = useAuth();
+  const { user, role, logout } = useAuth();
   const navigate = useNavigate();
 
   const adminNavItems = [
@@ -85,19 +85,16 @@ export const AdminSidebar: React.FC = () => {
         })}
       </div>
 
-      {/* Role Toggle Switcher */}
+      {/* Active Role Display */}
       <div className="px-3 pb-2">
         <button
-          onClick={() => {
-            quickLoginAs('USER');
-            navigate('/dashboard');
-          }}
+          onClick={() => navigate('/dashboard')}
           className="flex w-full items-center justify-between rounded-lg border border-slate-800/80 bg-slate-900/40 px-2.5 py-1.5 text-xs text-slate-400 hover:border-slate-700 hover:text-slate-200 transition-colors"
-          title="Switch to USER role"
+          title="Return to User View"
         >
           <span className="flex items-center gap-1.5">
             <ArrowRightLeft size={13} className="text-sky-400" />
-            <span>Role:</span>
+            <span>Active Role:</span>
           </span>
           <RoleBadge role={role || 'ADMIN'} />
         </button>

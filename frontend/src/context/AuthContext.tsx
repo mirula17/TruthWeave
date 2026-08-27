@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import type { User, Role } from '../types';
 import { authApi } from '../api/auth.api';
-import { MOCK_ADMIN_USER, MOCK_NORMAL_USER } from '../mocks/users';
 
 interface AuthContextType {
   user: User | null;
@@ -12,7 +11,6 @@ interface AuthContextType {
   login: (username: string, password: string) => Promise<void>;
   signup: (email: string, password: string, name?: string) => Promise<void>;
   logout: () => void;
-  quickLoginAs: (targetRole: Role) => void;
   updateUser: (updatedData: Partial<User>) => void;
 }
 
@@ -28,19 +26,37 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return null;
       }
     }
-    return MOCK_NORMAL_USER;
+    return null;
   });
 
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem('tw_token') || 'mock-user-jwt-token-112233');
-  const [loading, setLoading] = useState<boolean>(false);
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem('tw_token'));
+  const [loading, setLoading] = useState<boolean>(true);
 
+  // Validate stored session on mount
   useEffect(() => {
-    if (user) {
-      localStorage.setItem('tw_user', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('tw_user');
-    }
-  }, [user]);
+    const initAuth = async () => {
+      const storedToken = localStorage.getItem('tw_token');
+      if (storedToken) {
+        try {
+          const currentUser = await authApi.getMe();
+          setUser(currentUser);
+          localStorage.setItem('tw_user', JSON.stringify(currentUser));
+        } catch {
+          // Token is invalid or expired
+          setUser(null);
+          setToken(null);
+          localStorage.removeItem('tw_token');
+          localStorage.removeItem('tw_user');
+        }
+      } else {
+        setUser(null);
+        setToken(null);
+      }
+      setLoading(false);
+    };
+
+    initAuth();
+  }, []);
 
   const login = async (username: string, password: string) => {
     setLoading(true);
@@ -75,15 +91,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     localStorage.removeItem('tw_user');
   };
 
-  const quickLoginAs = (targetRole: Role) => {
-    const targetUser = targetRole === 'ADMIN' ? MOCK_ADMIN_USER : MOCK_NORMAL_USER;
-    const targetToken = targetRole === 'ADMIN' ? 'mock-admin-jwt-token-998877' : 'mock-user-jwt-token-112233';
-    setUser(targetUser);
-    setToken(targetToken);
-    localStorage.setItem('tw_token', targetToken);
-    localStorage.setItem('tw_user', JSON.stringify(targetUser));
-  };
-
   const updateUser = (updatedData: Partial<User>) => {
     if (user) {
       const updated = { ...user, ...updatedData };
@@ -101,7 +108,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     login,
     signup,
     logout,
-    quickLoginAs,
     updateUser,
   };
 
