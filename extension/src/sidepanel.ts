@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8000/api/v1";
+const API_URL = "https://truthweave.onrender.com/api/v1";
 
 interface UserProfile {
   email: string;
@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <p style="margin: 0; font-size: 12px; color: #94a3b8;">User: ${user.email} (${user.role})</p>
     `;
     verificationCard.style.display = "block";
-    
+
     // Check if background worker has a cached active selection
     chrome.runtime.sendMessage({ type: "GET_LAST_SELECTION" }, (response) => {
       if (response && response.text) {
@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (response.ok) {
         const data = await response.json();
-        
+
         let scoreColor = "#34d399"; // Green
         if (data.score < 40) scoreColor = "#f87171"; // Red
         else if (data.score < 75) scoreColor = "#fbbf24"; // Amber
