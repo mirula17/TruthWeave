@@ -154,13 +154,30 @@ class GeminiService:
         prompt += "\nEvaluate this claim and return the structured JSON result."
 
         try:
-            # Generate content using gemini-1.5-flash with system_instruction in constructor
-            model = genai.GenerativeModel(
-                model_name="gemini-1.5-flash",
-                system_instruction=SYSTEM_INSTRUCTION_TEXT,
-                generation_config={"response_mime_type": "application/json"}
-            )
-            response = model.generate_content(prompt)
+            # Generate content using configured model (default: gemini-2.5-flash / gemini-3.7-flash)
+            candidate_models = [settings.GEMINI_MODEL, "gemini-2.5-flash", "gemini-3.7-flash", "gemini-2.5-flash-lite"]
+            # Deduplicate while preserving order
+            models_to_try = list(dict.fromkeys(candidate_models))
+            
+            response = None
+            last_err = None
+            for model_name in models_to_try:
+                try:
+                    model = genai.GenerativeModel(
+                        model_name=model_name,
+                        system_instruction=SYSTEM_INSTRUCTION_TEXT,
+                        generation_config={"response_mime_type": "application/json"}
+                    )
+                    response = model.generate_content(prompt)
+                    if response and response.text:
+                        break
+                except Exception as model_err:
+                    last_err = model_err
+                    continue
+            
+            if not response or not response.text:
+                raise last_err or Exception("All candidate Gemini models failed to respond")
+
             cleaned = clean_json_response(response.text)
             parsed = json.loads(cleaned)
             
@@ -200,14 +217,30 @@ class GeminiService:
 
         try:
             image = Image.open(io.BytesIO(file_bytes))
-            model = genai.GenerativeModel(
-                model_name="gemini-1.5-flash",
-                system_instruction=SYSTEM_INSTRUCTION_IMAGE,
-                generation_config={"response_mime_type": "application/json"}
-            )
-            
             prompt = "Perform complete digital forensics verification on this image. Return structured JSON."
-            response = model.generate_content([prompt, image])
+            
+            candidate_models = [settings.GEMINI_MODEL, "gemini-2.5-flash", "gemini-3.7-flash", "gemini-2.5-flash-lite"]
+            models_to_try = list(dict.fromkeys(candidate_models))
+            
+            response = None
+            last_err = None
+            for model_name in models_to_try:
+                try:
+                    model = genai.GenerativeModel(
+                        model_name=model_name,
+                        system_instruction=SYSTEM_INSTRUCTION_IMAGE,
+                        generation_config={"response_mime_type": "application/json"}
+                    )
+                    response = model.generate_content([prompt, image])
+                    if response and response.text:
+                        break
+                except Exception as model_err:
+                    last_err = model_err
+                    continue
+            
+            if not response or not response.text:
+                raise last_err or Exception("All candidate Gemini models failed to respond")
+
             cleaned = clean_json_response(response.text)
             parsed = json.loads(cleaned)
             

@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     
     # External APIs
     GEMINI_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-2.5-flash"
     
     model_config = ConfigDict(
         env_file=(
