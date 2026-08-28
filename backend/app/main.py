@@ -27,6 +27,7 @@ origins = [
     "http://127.0.0.1:5177",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "https://truthweave-1.onrender.com",
 ]
 
 app.add_middleware(
