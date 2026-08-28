@@ -154,10 +154,19 @@ class GeminiService:
         prompt += "\nEvaluate this claim and return the structured JSON result."
 
         try:
-            # Generate content using configured model (default: gemini-2.5-flash / gemini-3.7-flash)
-            candidate_models = [settings.GEMINI_MODEL, "gemini-2.5-flash", "gemini-3.7-flash", "gemini-2.5-flash-lite"]
+            # Generate content using supported Gemini 3 / Gemini 2.5 models
+            candidate_models = [
+                settings.GEMINI_MODEL,
+                "gemini-3.5-flash-lite",
+                "gemini-3.7-flash",
+                "gemini-3.6-flash",
+                "gemini-3.5-flash",
+                "gemini-3.1-flash-lite",
+                "gemini-2.5-flash",
+                "gemini-2.5-pro",
+            ]
             # Deduplicate while preserving order
-            models_to_try = list(dict.fromkeys(candidate_models))
+            models_to_try = list(dict.fromkeys([m for m in candidate_models if m]))
             
             response = None
             last_err = None
@@ -219,8 +228,17 @@ class GeminiService:
             image = Image.open(io.BytesIO(file_bytes))
             prompt = "Perform complete digital forensics verification on this image. Return structured JSON."
             
-            candidate_models = [settings.GEMINI_MODEL, "gemini-2.5-flash", "gemini-3.7-flash", "gemini-2.5-flash-lite"]
-            models_to_try = list(dict.fromkeys(candidate_models))
+            candidate_models = [
+                settings.GEMINI_MODEL,
+                "gemini-3.5-flash-lite",
+                "gemini-3.7-flash",
+                "gemini-3.6-flash",
+                "gemini-3.5-flash",
+                "gemini-3.1-flash-lite",
+                "gemini-2.5-flash",
+                "gemini-2.5-pro",
+            ]
+            models_to_try = list(dict.fromkeys([m for m in candidate_models if m]))
             
             response = None
             last_err = None
