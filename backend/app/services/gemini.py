@@ -4,7 +4,15 @@ import re
 from typing import Any, Dict, List, Optional
 from PIL import Image
 import google.generativeai as genai
-from duckduckgo_search import DDGS
+
+try:
+    from ddgs import DDGS
+except ImportError:
+    try:
+        from duckduckgo_search import DDGS
+    except ImportError:
+        DDGS = None
+
 from app.core.config import settings
 
 # Configure Gemini
@@ -63,6 +71,8 @@ You must output your evaluation strictly as a valid JSON object matching this st
 
 def search_web(query: str, max_results: int = 3) -> List[Dict[str, Any]]:
     """Query DuckDuckGo for live context."""
+    if not DDGS:
+        return []
     try:
         with DDGS() as ddgs:
             results = list(ddgs.text(query, max_results=max_results))
@@ -144,15 +154,13 @@ class GeminiService:
         prompt += "\nEvaluate this claim and return the structured JSON result."
 
         try:
-            # Generate content using gemini-1.5-flash
-            model = genai.GenerativeModel("gemini-1.5-flash")
-            response = model.generate_content(
-                prompt,
-                generation_config={
-                    "response_mime_type": "application/json",
-                    "system_instruction": SYSTEM_INSTRUCTION_TEXT
-                }
+            # Generate content using gemini-1.5-flash with system_instruction in constructor
+            model = genai.GenerativeModel(
+                model_name="gemini-1.5-flash",
+                system_instruction=SYSTEM_INSTRUCTION_TEXT,
+                generation_config={"response_mime_type": "application/json"}
             )
+            response = model.generate_content(prompt)
             cleaned = clean_json_response(response.text)
             parsed = json.loads(cleaned)
             
@@ -192,17 +200,14 @@ class GeminiService:
 
         try:
             image = Image.open(io.BytesIO(file_bytes))
-            model = genai.GenerativeModel("gemini-1.5-flash")
+            model = genai.GenerativeModel(
+                model_name="gemini-1.5-flash",
+                system_instruction=SYSTEM_INSTRUCTION_IMAGE,
+                generation_config={"response_mime_type": "application/json"}
+            )
             
             prompt = "Perform complete digital forensics verification on this image. Return structured JSON."
-            
-            response = model.generate_content(
-                [prompt, image],
-                generation_config={
-                    "response_mime_type": "application/json",
-                    "system_instruction": SYSTEM_INSTRUCTION_IMAGE
-                }
-            )
+            response = model.generate_content([prompt, image])
             cleaned = clean_json_response(response.text)
             parsed = json.loads(cleaned)
             

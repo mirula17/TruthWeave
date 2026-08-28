@@ -53,7 +53,7 @@ export const VerdictCard: React.FC<VerdictCardProps> = ({ result }) => {
             </span>
             <span className="flex items-center gap-1 text-slate-500">
               <Calendar size={13} />
-              <span>{new Date(result.createdAt).toLocaleDateString()}</span>
+              <span>{result.createdAt ? new Date(result.createdAt).toLocaleDateString() : new Date().toLocaleDateString()}</span>
             </span>
             {result.isDemo && (
               <span className="rounded-full bg-sky-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-sky-400 border border-sky-500/20">
