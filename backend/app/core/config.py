@@ -15,8 +15,15 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8  # 8 days
     
-    # Databases - Use 127.0.0.1 by default for PostgreSQL on Windows
+    # Databases
     DATABASE_URL: str = "postgresql://admin:strong-password@127.0.0.1:5432/truthweave"
+    
+    @property
+    def SQLALCHEMY_DATABASE_URI(self) -> str:
+        url = self.DATABASE_URL
+        if url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql://", 1)
+        return url
     
     # External APIs
     GEMINI_API_KEY: str = ""
